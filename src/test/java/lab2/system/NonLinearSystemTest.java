@@ -33,13 +33,12 @@ class NonLinearSystemTest {
     @Test
     void solveIterations() {
         NonLinearSystem sys = new NonLinearSystem();
-        sys.addFunction(this::h);
-        sys.addFunction(this::phi);
+        sys.addFunction(this::f);
+        sys.addFunction(this::g);
 
-        double[] ans = sys.findSolution(1, 1);
-        double[] exp = new double[] { 0.2, 0.706};
+        double[] ans = sys.findSolution(1, 2);
+        double[] exp = new double[] { 0.808, 1.846 };
 
         assertArrayEquals(exp, ans);
-
     }
 }

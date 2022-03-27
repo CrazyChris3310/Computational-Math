@@ -1,8 +1,8 @@
 package lab2.system;
 
-import lab1.calc.EqSystem;
-import lab1.calc.LinearAlgebra;
+import lab2.equation.Expression;
 
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,47 +10,27 @@ public class NonLinearSystem {
 
     private final List<ManyVariableFunction> system = new LinkedList<>();
     private static final int LIMIT = 20000;
-    private final double accuracy = 1e-4;
+    private static final double ACCURACY = 1e-4;
 
-    public double[] solveNewton(double ... X) {
+    public static final List<NonLinearSystem> NON_LINEAR_SYSTEMS;
 
-        boolean shouldContinue;
+    static {
+        NON_LINEAR_SYSTEMS = new LinkedList<>();
 
-        do {
-            double[][] jacobian = findJacobian(X);
-            double[] bs = new double[system.size()];
-            for (int i = 0; i < system.size(); ++i) {
-                bs[i] = -system.get(i).solve(X);
-            }
+        NonLinearSystem sys = new NonLinearSystem();
+        sys.addFunction(Functions::func1);
+        sys.addFunction(Functions::func2);
+        NON_LINEAR_SYSTEMS.add(sys);
 
-            EqSystem sys = new EqSystem(system.size());
-            sys.setCoefs(jacobian);
-            sys.setBs(bs);
+        sys = new NonLinearSystem();
+        sys.addFunction(Functions::func3);
+        sys.addFunction(Functions::func4);
+        NON_LINEAR_SYSTEMS.add(sys);
 
-            double[] deltas = LinearAlgebra.solveGaussian(sys, 1e-5);
-            if (deltas == null)
-                return null;
-
-            shouldContinue = false;
-            for (int i = 0; i < X.length; ++i) {
-                X[i] += deltas[i];
-                if (deltas[i] > accuracy)
-                    shouldContinue = true;
-            }
-
-        } while (shouldContinue);
-
-        return X;
-    }
-
-    private double[][] findJacobian(double ... vars) {
-        double[][] jacobian = new double[vars.length][vars.length];
-        for (int i = 0; i < vars.length; ++i) {
-            for (int j = 0; j < vars.length; ++j) {
-                jacobian[i][j] = system.get(i).partialDerivative(j, vars);
-            }
-        }
-        return jacobian;
+        sys = new NonLinearSystem();
+        sys.addFunction(Functions::func4);
+        sys.addFunction(Functions::func1);
+        NON_LINEAR_SYSTEMS.add(sys);
     }
 
     public double[] findSolution(double ... point) {
@@ -98,7 +78,7 @@ public class NonLinearSystem {
             }
             point = newAns.clone();
             count += 1;
-        } while (delta > accuracy && count < LIMIT);
+        } while (delta > ACCURACY && count < LIMIT);
 
         return newAns;
     }
@@ -107,4 +87,20 @@ public class NonLinearSystem {
         system.add(f);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        try {
+            for (ManyVariableFunction f : system) {
+                Method method = f.getClass().getMethod("solve", double[].class);
+                Expression expression = method.getAnnotation(Expression.class);
+                if (expression != null) {
+                    builder.append(expression.formula()).append("\n");
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return builder.toString();
+    }
 }
