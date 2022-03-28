@@ -5,18 +5,18 @@ import lab1.calc.EqSystem;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 
 public class Input {
 
-    private final BufferedReader reader;
+    private final Scanner sc;
 
     public Input() {
-        reader = new BufferedReader(new InputStreamReader(System.in));
+        sc = new Scanner(System.in);
     }
 
-    private int readSize() throws IOException {
-        String num = reader.readLine();
-        return Integer.parseInt(num);
+    private int readSize() {
+        return readInt();
     }
 
     public EqSystem readMatrix() throws IOException {
@@ -26,7 +26,7 @@ public class Input {
         double[] bs = new double[size];
 
         for (int i = 0; i < size; ++i) {
-            String line = reader.readLine();
+            String line = sc.nextLine();
             line = line.replaceAll(",", ".");
             double[] row = new double[size];
             String[] splited = line.split(" ");
@@ -39,6 +39,34 @@ public class Input {
         m.setBs(bs);
 
         return m;
+    }
+
+    public double readDouble() {
+        String str;
+        Double res = null;
+        do {
+            str = sc.nextLine().replaceAll(",", ".");
+            try {
+                res = Double.parseDouble(str);
+            } catch (NumberFormatException e) {
+                System.out.print("Wrong input format. Try again: ");
+            }
+        } while (res == null);
+        return res;
+    }
+
+    public int readInt() {
+        String str;
+        Integer res = null;
+        do {
+            str = sc.nextLine().replaceAll(",", ".");
+            try {
+                res = Integer.parseInt(str);
+            } catch (NumberFormatException e) {
+                System.out.print("Wrong input format. Try again: ");
+            }
+        } while (res == null);
+        return res;
     }
 
 }

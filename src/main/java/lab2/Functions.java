@@ -1,7 +1,5 @@
 package lab2;
 
-import lab2.equation.Expression;
-
 public class Functions {
 
     @Expression(formula = "5x^3 + 8x^2 -2.4x - 1")

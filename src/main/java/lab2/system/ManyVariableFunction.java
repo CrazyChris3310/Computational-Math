@@ -1,6 +1,5 @@
 package lab2.system;
 
-import lab2.equation.Expression;
 public interface ManyVariableFunction {
 
     double EPS = 1e-4;

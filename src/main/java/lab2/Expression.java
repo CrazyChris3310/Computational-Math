@@ -1,4 +1,4 @@
-package lab2.equation;
+package lab2;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
