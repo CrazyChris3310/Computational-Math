@@ -36,6 +36,42 @@ public class Lab2 {
     }
   }
 
+  private static void resolveEquation() {
+    Func func = selectEquation();
+    System.out.print("Enter left border: ");
+    double a = input.readDouble();
+    System.out.print("Enter right border: ");
+    double b = input.readDouble();
+    Solver solver = new Solver();
+    double[][] result = solver.solveEquation(func, a, b);
+
+    System.out.println("Newton method: ");
+    for (int i = 0; i < result[0].length; ++i) {
+      System.out.printf("x" + (i + 1) + " = %.4f\n", result[0][i]);
+    }
+    System.out.println("Iteration method: ");
+    for (int i = 0; i < result[0].length; ++i) {
+      System.out.printf("x" + (i + 1) + " = %.4f\n", result[1][i]);
+    }
+  }
+
+  private static void resolveSystem() {
+    NonLinearSystem nls = selectSystem();
+    System.out.println("Enter approximate solution");
+    System.out.print("x: ");
+    double x = input.readDouble();
+    System.out.print("y: ");
+    double y = input.readDouble();
+
+    double[] solution = nls.findSolution(x, y);
+    if (solution == null) {
+      System.out.println("System can't be solved with iterations method");
+    } else {
+      System.out.println("x = " + solution[0]);
+      System.out.println("y = " + solution[1]);
+    }
+  }
+
   public static Func selectEquation() {
     StringBuilder builder = new StringBuilder();
     Method[] functions = Functions.class.getDeclaredMethods();
@@ -71,41 +107,5 @@ public class Lab2 {
       case 2 -> new SystemTwo();
       default -> null;
     };
-  }
-
-  private static void resolveEquation() {
-    Func func = selectEquation();
-    System.out.print("Enter left border: ");
-    double a = input.readDouble();
-    System.out.print("Enter right border: ");
-    double b = input.readDouble();
-    Solver solver = new Solver();
-    double[][] result = solver.solveEquation(func, a, b);
-
-    System.out.println("Newton method: ");
-    for (int i = 0; i < result[0].length; ++i) {
-      System.out.printf("x" + (i + 1) +  " = %.4f\n", result[0][i]);
-    }
-    System.out.println("Iteration method: ");
-    for (int i = 0; i < result[0].length; ++i) {
-      System.out.printf("x" + (i + 1) +  " = %.4f\n", result[1][i]);
-    }
-  }
-
-  private static void resolveSystem() {
-    NonLinearSystem nls = selectSystem();
-    System.out.println("Enter approximate solution");
-    System.out.print("x: ");
-    double x = input.readDouble();
-    System.out.print("y: ");
-    double y = input.readDouble();
-
-    double[] solution = nls.findSolution(x, y);
-    if (solution == null) {
-      System.out.println("System can't be solved with iterations method");
-    } else {
-      System.out.println("x = " + solution[0]);
-      System.out.println("y = " + solution[1]);
-    }
   }
 }

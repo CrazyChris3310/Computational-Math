@@ -17,6 +17,33 @@ public abstract class AbstractNonLinearSystem implements NonLinearSystem {
     system.add(function);
   }
 
+  public double[] findSolution(double... point) {
+
+    double[] lambdas = findLambdas(point);
+
+    double q = findQuitParameter(lambdas, point);
+    if (q > 1) {
+      return null;
+    }
+
+    double[] newAns = new double[point.length];
+    double delta;
+    double count = 0;
+    do {
+      delta = 0;
+      for (int i = 0; i < point.length; ++i) {
+        newAns[i] = point[i] + lambdas[i] * system.get(i).solve(point);
+        if (Math.abs(newAns[i] - point[i]) > delta) {
+          delta = Math.abs(newAns[i] - point[i]);
+        }
+      }
+      point = newAns.clone();
+      count += 1;
+    } while (delta > ACCURACY && count < LIMIT);
+
+    return newAns;
+  }
+
   private double[] findLambdas(double[] point) {
     double[] lambdas = new double[point.length];
     for (int i = 0; i < point.length; ++i) {
@@ -28,8 +55,9 @@ public abstract class AbstractNonLinearSystem implements NonLinearSystem {
       for (double dx = a; dx <= b; dx += 0.01) {
         temp[i] = dx;
         double der = f.partialDerivative(i, temp);
-        if (der > max_derivative)
+        if (der > max_derivative) {
           max_derivative = der;
+        }
       }
       lambdas[i] = -1 / max_derivative;
     }
@@ -45,42 +73,18 @@ public abstract class AbstractNonLinearSystem implements NonLinearSystem {
         temp += lambdas[i] * system.get(i).partialDerivative(j, point);
         sum += Math.abs(temp);
       }
-      if (sum > max)
+      if (sum > max) {
         max = sum;
+      }
     }
     return max;
-  }
-
-  public double[] findSolution(double ... point) {
-
-    double[] lambdas = findLambdas(point);
-
-    double q = findQuitParameter(lambdas, point);
-    if (q > 1)
-      return null;
-
-    double[] newAns = new double[point.length];
-    double delta;
-    double count = 0;
-    do {
-      delta = 0;
-      for (int i = 0; i < point.length; ++i) {
-        newAns[i] = point[i] + lambdas[i] * system.get(i).solve(point);
-        if (Math.abs(newAns[i] - point[i]) > delta)
-          delta = Math.abs(newAns[i] - point[i]);
-      }
-      point = newAns.clone();
-      count += 1;
-    } while (delta > ACCURACY && count < LIMIT);
-
-    return newAns;
   }
 
   @Override
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
     Method[] methods = this.getClass().getMethods();
-    for (Method method: methods) {
+    for (Method method : methods) {
       Expression expression = method.getAnnotation(Expression.class);
       if (expression != null) {
         stringBuilder.append("| ").append(expression.formula()).append(" = 0").append("\n");

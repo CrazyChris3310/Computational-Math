@@ -9,17 +9,17 @@ public class SystemTwo extends AbstractNonLinearSystem {
   }
 
   @Expression(formula = "2x^2 - xy - 5x + 1")
-  public double func1(double ...vars) {
+  public double func1(double... vars) {
     double x = vars[0];
     double y = vars[1];
-    return 2*x*x - x*y - 5*x + 1;
+    return 2 * x * x - x * y - 5 * x + 1;
   }
 
   @Expression(formula = "x + 3ln(x) - y^2")
-  public double func2(double ...vars) {
+  public double func2(double... vars) {
     double x = vars[0];
     double y = vars[1];
-    return x + 3*Math.log(x) - y*y;
+    return x + 3 * Math.log(x) - y * y;
   }
 
 }
