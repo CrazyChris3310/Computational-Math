@@ -5,7 +5,9 @@ import lab2.equation.Func;
 import lab2.equation.Solver;
 import lab2.system.examples.NonLinearSystem;
 import lab2.system.examples.SystemOne;
+import lab2.system.examples.SystemThree;
 import lab2.system.examples.SystemTwo;
+import lab2.system.matrix.exceptions.MethodDivergesException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,6 +22,7 @@ public class Lab2 {
   static {
     systems.add(new SystemOne());
     systems.add(new SystemTwo());
+    systems.add(new SystemThree());
   }
 
   public static void main(String[] args) {
@@ -45,13 +48,25 @@ public class Lab2 {
     Solver solver = new Solver();
     double[][] result = solver.solveEquation(func, a, b);
 
+    if (result == null) {
+      System.out.println("No roots were found on this interval");
+      return;
+    }
     System.out.println("Newton method: ");
-    for (int i = 0; i < result[0].length; ++i) {
-      System.out.printf("x" + (i + 1) + " = %.4f\n", result[0][i]);
+    if (result[0] != null) {
+      for (int i = 0; i < result[0].length; ++i) {
+        System.out.printf("x" + (i + 1) + " = %.4f\n", result[0][i]);
+      }
+    } else {
+      System.out.println("Can't solve equation with this method");
     }
     System.out.println("Iteration method: ");
-    for (int i = 0; i < result[0].length; ++i) {
-      System.out.printf("x" + (i + 1) + " = %.4f\n", result[1][i]);
+    if (result[0] != null) {
+      for (int i = 0; i < result[0].length; ++i) {
+        System.out.printf("x" + (i + 1) + " = %.4f\n", result[1][i]);
+      }
+    } else {
+      System.out.println("Can't solve equation with this method");
     }
   }
 
@@ -63,7 +78,14 @@ public class Lab2 {
     System.out.print("y: ");
     double y = input.readDouble();
 
-    double[] solution = nls.findSolution(x, y);
+    double[] solution;
+    try {
+      solution = nls.solve(x, y);
+    } catch (MethodDivergesException e) {
+      System.out.println(e.getMessage());
+      return;
+    }
+
     if (solution == null) {
       System.out.println("System can't be solved with iterations method");
     } else {
@@ -102,10 +124,6 @@ public class Lab2 {
     }
     System.out.print("\nSelect a system to solve: ");
     int n = input.readInt();
-    return switch (n) {
-      case 1 -> new SystemOne();
-      case 2 -> new SystemTwo();
-      default -> null;
-    };
+    return systems.get(n - 1);
   }
 }

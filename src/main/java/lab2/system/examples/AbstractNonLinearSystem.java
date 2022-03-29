@@ -2,8 +2,12 @@ package lab2.system.examples;
 
 import lab2.Expression;
 import lab2.system.ManyVariableFunction;
+import lab2.system.matrix.Matrix;
+import lab2.system.matrix.Vector;
+import lab2.system.matrix.exceptions.MethodDivergesException;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 public abstract class AbstractNonLinearSystem implements NonLinearSystem {
@@ -17,67 +21,77 @@ public abstract class AbstractNonLinearSystem implements NonLinearSystem {
     system.add(function);
   }
 
-  public double[] findSolution(double... point) {
+  public double[] solve(double... point) {
+    Matrix lambdas = findLambdasMatrix(point);
 
-    double[] lambdas = findLambdas(point);
+    Vector pointVector = new Vector(point);
 
-    double q = findQuitParameter(lambdas, point);
-    if (q > 1) {
-      return null;
-    }
-
-    double[] newAns = new double[point.length];
     double delta;
     double count = 0;
     do {
       delta = 0;
+      double[] funcValues = new double[system.size()];
       for (int i = 0; i < point.length; ++i) {
-        newAns[i] = point[i] + lambdas[i] * system.get(i).solve(point);
-        if (Math.abs(newAns[i] - point[i]) > delta) {
-          delta = Math.abs(newAns[i] - point[i]);
+        funcValues[i] = system.get(i).solve(pointVector.getVector());
+      }
+
+      Vector newPointVector = pointVector.subtract(lambdas.multiply(new Vector(funcValues)));
+
+      for (int i = 0; i < point.length; ++i) {
+        if (Math.abs(newPointVector.get(i) - pointVector.get(i)) > delta) {
+          delta = Math.abs(newPointVector.get(i) - pointVector.get(i));
         }
       }
-      point = newAns.clone();
+      pointVector = new Vector(newPointVector.getVector().clone());
       count += 1;
     } while (delta > ACCURACY && count < LIMIT);
 
-    return newAns;
+    if (count >= LIMIT) {
+      return null;
+    }
+
+    return pointVector.getVector();
   }
 
-  private double[] findLambdas(double[] point) {
-    double[] lambdas = new double[point.length];
-    for (int i = 0; i < point.length; ++i) {
-      double a = point[i] - 0.5;
-      double b = point[i] + 0.5;
-      double[] temp = point.clone();
-      ManyVariableFunction f = system.get(i);
-      double max_derivative = f.partialDerivative(i, temp);
-      for (double dx = a; dx <= b; dx += 0.01) {
-        temp[i] = dx;
-        double der = f.partialDerivative(i, temp);
-        if (der > max_derivative) {
-          max_derivative = der;
+  public Matrix findLambdasMatrix(double[] point) {
+    double[][] jacobian = findJacobian(point);
+    Matrix lambdas = new Matrix(jacobian).getReverseMatrix();
+    if (lambdas == null) {
+      throw new MethodDivergesException("Jacobian matrix determinant is zero for point " +
+                                        Arrays.toString(point));
+    }
+    for (int i = 0; i < lambdas.getMatrix().length; ++i) {
+      double sum = 0;
+      boolean hasNaN = false;
+      for (int j = 0; j < lambdas.getMatrix().length; ++j) {
+        if (Double.isNaN(lambdas.getElement(i, j))) {
+          hasNaN = true;
+          break;
         }
+        sum += Math.abs(lambdas.getElement(i, j));
       }
-      lambdas[i] = -1 / max_derivative;
+      if (sum >= 1 || hasNaN) {
+        throw new MethodDivergesException("Can't solve system with this method at this point "
+                                          + Arrays.toString(point) + ". You may try another point "
+                                          + "that is more close to real answer");
+      }
     }
     return lambdas;
   }
 
-  private double findQuitParameter(double[] lambdas, double[] point) {
-    double max = 0;
-    for (int i = 0; i < system.size(); ++i) {
-      double sum = 0;
+  public double[][] findJacobian(double[] point) {
+    double[][] jacobian = new double[point.length][point.length];
+    for (int i = 0; i < point.length; ++i) {
       for (int j = 0; j < point.length; ++j) {
-        double temp = i == j ? 1 : 0;
-        temp += lambdas[i] * system.get(i).partialDerivative(j, point);
-        sum += Math.abs(temp);
-      }
-      if (sum > max) {
-        max = sum;
+        jacobian[i][j] = system.get(i).partialDerivative(j, point);
       }
     }
-    return max;
+    return jacobian;
+  }
+
+  @Override
+  public int size() {
+    return system.size();
   }
 
   @Override
