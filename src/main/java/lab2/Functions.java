@@ -27,4 +27,19 @@ public class Functions {
     return 10 * Math.log(x);
   }
 
+  @Expression(formula = "sin(x)/x")
+  public static double sinDivideX(double x) {
+    return Math.sin(x) / x;
+  }
+
+  @Expression(formula = "1/x")
+  public static double hyperbola(double x) {
+    return 1 / x;
+  }
+
+  @Expression(formula = "{ x >= 0 ? x : x^2 }")
+  public static double split(double x) {
+    return x >= 0 ? x : x * x;
+  }
+
 }

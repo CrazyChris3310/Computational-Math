@@ -38,6 +38,12 @@ public abstract class AbstractNonLinearSystem implements NonLinearSystem {
       Vector newPointVector = pointVector.subtract(lambdas.multiply(new Vector(funcValues)));
 
       for (int i = 0; i < point.length; ++i) {
+        if (Double.isNaN(newPointVector.get(i))) {
+          throw new MethodDivergesException("Can't solve system with this method at this point "
+                                            + Arrays.toString(point) +
+                                            ". You may try another point "
+                                            + "that is more close to real answer");
+        }
         if (Math.abs(newPointVector.get(i) - pointVector.get(i)) > delta) {
           delta = Math.abs(newPointVector.get(i) - pointVector.get(i));
         }
@@ -61,20 +67,15 @@ public abstract class AbstractNonLinearSystem implements NonLinearSystem {
                                         Arrays.toString(point));
     }
     for (int i = 0; i < lambdas.getMatrix().length; ++i) {
-      double sum = 0;
-      boolean hasNaN = false;
       for (int j = 0; j < lambdas.getMatrix().length; ++j) {
         if (Double.isNaN(lambdas.getElement(i, j))) {
-          hasNaN = true;
-          break;
+          throw new MethodDivergesException("Can't solve system with this method at this point "
+                                            + Arrays.toString(point) +
+                                            ". You may try another point "
+                                            + "that is more close to real answer");
         }
-        sum += Math.abs(lambdas.getElement(i, j));
       }
-      if (sum >= 1 || hasNaN) {
-        throw new MethodDivergesException("Can't solve system with this method at this point "
-                                          + Arrays.toString(point) + ". You may try another point "
-                                          + "that is more close to real answer");
-      }
+
     }
     return lambdas;
   }
