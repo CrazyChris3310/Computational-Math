@@ -1,6 +1,7 @@
 package lab2.system.examples;
 
 import lab2.Expression;
+
 public class SystemTwo extends AbstractNonLinearSystem {
 
   public SystemTwo() {

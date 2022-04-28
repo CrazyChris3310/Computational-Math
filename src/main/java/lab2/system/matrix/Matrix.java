@@ -1,6 +1,7 @@
 package lab2.system.matrix;
 
 import lab2.system.matrix.exceptions.DimensionMismatchException;
+
 public class Matrix {
   private final double[][] matrix;
 

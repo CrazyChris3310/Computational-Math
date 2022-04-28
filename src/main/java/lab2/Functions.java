@@ -37,9 +37,4 @@ public class Functions {
     return 1 / x;
   }
 
-  @Expression(formula = "{ x >= 0 ? x : x^2 }")
-  public static double split(double x) {
-    return x >= 0 ? x : x * x;
-  }
-
 }

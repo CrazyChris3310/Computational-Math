@@ -1,6 +1,7 @@
 package lab2.system.examples;
 
 import lab2.Expression;
+
 public class SystemThree extends AbstractNonLinearSystem {
   public SystemThree() {
     addEquation(this::func1);

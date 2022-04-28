@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
 public abstract class AbstractNonLinearSystem implements NonLinearSystem {
 
   private static final int LIMIT = 20000;
