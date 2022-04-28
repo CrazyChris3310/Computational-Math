@@ -13,14 +13,6 @@ class Interpolator {
         return table
     }
 
-    private fun fact(x: Int): Int {
-        var res = 1
-        for (i in 1..x) {
-            res *= i
-        }
-        return res
-    }
-
     private fun Newton(value: Double, x: DoubleArray, o: Int, diffs: Array<DoubleArray>): Double {
         var result = diffs[0][o]
         val t = (value - x[o]) / (x[1] - x[0])
@@ -30,9 +22,8 @@ class Interpolator {
                 continue
             }
             for (j in 0 until i) {
-                temp *= (t - j)
+                temp *= (t - j) / (j + 1)
             }
-            temp /= fact(i)
             result += temp
         }
         return result

@@ -18,7 +18,7 @@ public class Main {
   }
 
   private static void resolveEquation() {
-    Function<Double, Double> func = selectEquation();
+    Function<Double, Double> func = selectEquation(Functions.class);
     System.out.print("Enter left border: ");
     double a = input.readDouble();
     System.out.print("Enter right border: ");
@@ -40,9 +40,9 @@ public class Main {
     System.out.println("Steps: " + (int) result[2][1]);
   }
 
-  public static Function<Double, Double> selectEquation() {
+  public static Function<Double, Double> selectEquation(Class<?> clazz) {
     StringBuilder builder = new StringBuilder();
-    Method[] functions = Functions.class.getDeclaredMethods();
+    Method[] functions = clazz.getDeclaredMethods();
     for (int i = 0; i < functions.length; ++i) {
       Expression expression = functions[i].getAnnotation(Expression.class);
       if (expression != null) {

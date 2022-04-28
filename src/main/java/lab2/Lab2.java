@@ -40,7 +40,7 @@ public class Lab2 {
   }
 
   private static void resolveEquation() {
-    Func func = selectEquation();
+    Func func = selectEquation(Functions.class);
     System.out.print("Enter left border: ");
     double a = input.readDouble();
     System.out.print("Enter right border: ");
@@ -94,9 +94,9 @@ public class Lab2 {
     }
   }
 
-  public static Func selectEquation() {
+  public static Func selectEquation(Class<?> clazz) {
     StringBuilder builder = new StringBuilder();
-    Method[] functions = Functions.class.getDeclaredMethods();
+    Method[] functions = clazz.getDeclaredMethods();
     for (int i = 0; i < functions.length; ++i) {
       Expression expression = functions[i].getAnnotation(Expression.class);
       if (expression != null) {

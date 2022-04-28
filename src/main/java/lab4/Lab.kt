@@ -7,7 +7,7 @@ import lab3.Main
 val input = Input()
 
 fun main() {
-    val func = Main.selectEquation()
+    val func = Main.selectEquation(Lab4Functions().javaClass)
     print("Enter left bound: ")
     val start = input.readDouble()
     print("Enter right bound: ")
